@@ -62,13 +62,12 @@ class ProductAdd extends ConsumerWidget {
                         ProductModel(
                             name: productNameController.text,
                             price:
-                                double.tryParse(productPriceController.text) ??
-                                    0,
+                                num.tryParse(productPriceController.text) ?? 0,
                             purchased: false,
                             userEmail: userEmail));
                     productNameController.text = '';
                     productPriceController.text =
-                        Random().nextInt(9999).toString();
+                        (Random().nextDouble() * 256).toStringAsFixed(2);
                   }
                 },
                 child: const Text('Add'),
