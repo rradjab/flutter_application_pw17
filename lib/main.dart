@@ -20,8 +20,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   images = await getImages();
-  //включает emulator suite
-  if (!kDebugMode) {
+
+  //kDebugMode = true - emulator suite
+  if (kDebugMode) {
     FirebaseFirestore.instance
         .useFirestoreEmulator('127.0.0.1', 8080, sslEnabled: false);
 
@@ -70,7 +71,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+        stream: FirebaseAuth.instance.userChanges(),
         initialData: FirebaseAuth.instance.currentUser,
         builder: (context, snapshot) {
           if (snapshot.data == null || !snapshot.hasData) {

@@ -21,8 +21,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool? isUserNotExists;
 
   @override
-  void initState() {
-    super.initState();
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   @override

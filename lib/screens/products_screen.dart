@@ -23,9 +23,9 @@ class ProductsScreen extends ConsumerWidget {
               : const Center(
                   child: CircularProgressIndicator(),
                 ),
-          Column(
+          const Column(
             children: [
-              const Expanded(
+              Expanded(
                 child: ProductsView(),
               ),
               ProductAdd(),

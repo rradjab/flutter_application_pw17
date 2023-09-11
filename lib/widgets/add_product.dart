@@ -5,16 +5,28 @@ import 'package:flutter_application_pw17/models/product_model.dart';
 import 'package:flutter_application_pw17/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductAdd extends ConsumerWidget {
-  ProductAdd({super.key});
+class ProductAdd extends ConsumerStatefulWidget {
+  const ProductAdd({super.key});
 
+  @override
+  ConsumerState<ProductAdd> createState() => _ProductAddState();
+}
+
+class _ProductAddState extends ConsumerState<ProductAdd> {
   final productNameController = TextEditingController()..text = 'product';
 
   final productPriceController = TextEditingController()
     ..text = (Random().nextDouble() * 256).toStringAsFixed(2);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    productNameController.dispose();
+    productPriceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       color: Colors.deepPurple,
       height: 60,

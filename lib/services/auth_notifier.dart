@@ -54,7 +54,8 @@ class FireStoreAuthService extends StateNotifier<String> {
       UserCredential result = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       if (result.user != null) {
-        result.user!.updateDisplayName(username);
+        await result.user!.updateDisplayName(username);
+        await result.user!.reload();
       }
     } on FirebaseAuthException catch (e) {
       state = e.code;
