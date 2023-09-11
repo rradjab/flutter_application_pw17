@@ -2,36 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_pw17/providers/providers.dart';
+import 'package:flutter_application_pw17/github_sign.dart';
 
 class FireStoreAuthService extends StateNotifier<String> {
   FireStoreAuthService() : super('');
-
-  void switchUser() {
-    state = '';
-  }
 
   void checkIfUserExists(String email, WidgetRef ref) async {
     try {
       final signInMethods =
           await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-      if (signInMethods.isEmpty) {
-        state = 'not-exists';
-      } else {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .where('userEmail', isEqualTo: email)
-            .get();
-        ref
-            .read(usernameProvider.notifier)
-            .update((state) => snapshot.docs.first['userName']);
-        state = 'exists';
-      }
+      state = '${signInMethods.isEmpty ? 'not-' : ''}exists';
     } on FirebaseAuthException catch (e) {
       state = e.code;
     } catch (e) {
       state = e.toString().contains('No element') ? 'not-exists' : e.toString();
     }
+  }
+
+  void signInWithGitHub(BuildContext context, WidgetRef ref) async {
+    try {
+      final result = await gitHubSignIn.signIn(context);
+
+      final githubAuthCredential = GithubAuthProvider.credential(result.token!);
+
+      await FirebaseAuth.instance.signInWithCredential(githubAuthCredential);
+
+      await FirebaseFirestore.instance.collection("users").doc().set({
+        "userName": FirebaseAuth.instance.currentUser!.displayName!,
+        "userEmail": FirebaseAuth.instance.currentUser!.email!,
+      });
+    } catch (e) {
+      state = e.toString();
+    }
+    state = 'ok';
   }
 
   void loginUser(String email, String password) async {
@@ -48,17 +51,20 @@ class FireStoreAuthService extends StateNotifier<String> {
 
   void createUser(String email, String password, String username) async {
     try {
-      await FirebaseAuth.instance
+      UserCredential result = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await FirebaseFirestore.instance.collection("users").doc().set({
-        "userName": username,
-        "userEmail": email,
-      });
-      state = 'ok';
+      if (result.user != null) {
+        result.user!.updateDisplayName(username);
+      }
     } on FirebaseAuthException catch (e) {
       state = e.code;
     } catch (e) {
-      debugPrint(e.toString());
+      state = e.toString();
     }
+    state = 'ok';
+  }
+
+  void signOut() {
+    FirebaseAuth.instance.signOut();
   }
 }

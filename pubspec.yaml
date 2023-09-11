@@ -38,12 +38,11 @@ dependencies:
   firebase_core: ^2.15.1
   cloud_firestore: ^4.8.5
   firebase_storage: ^11.2.6
-  popover: ^0.2.8+2
   flutter_riverpod: ^2.3.10
   firebase_auth: ^4.9.0
   email_validator: ^2.1.17
-  dio: ^5.3.2
-  firebase_core_desktop: ^1.0.2
+  firebase_auth_platform_interface: ^6.18.0
+  github_sign_in: ^0.0.5-dev.4
 
 dev_dependencies:
   flutter_test:

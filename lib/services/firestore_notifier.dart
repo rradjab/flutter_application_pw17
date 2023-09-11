@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FireStoreService extends StateNotifier<List<ProductModel>> {
   FireStoreService() : super([]);
+
   final _products = FirebaseFirestore.instance
       .collection('products')
       .withConverter<ProductModel>(

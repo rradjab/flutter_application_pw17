@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_pw17/main.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_pw17/models/user_model.dart';
 import 'package:flutter_application_pw17/providers/providers.dart';
-import 'package:flutter_application_pw17/screens/products_screen.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -23,7 +22,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   @override
   void initState() {
-    ref.read(backImgProvider.notifier).getImages();
     super.initState();
   }
 
@@ -37,32 +35,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final images = ref.watch(backImgProvider);
-    final username = ref.watch(usernameProvider);
-
     ref.watch(firebaseAuthProvider.notifier).addListener((state) {
       switch (state) {
-        case '':
-          wellcomeText = 'Wellcome';
-          break;
         case 'exists':
           isUserNotExists = false;
-          wellcomeText = 'Wellcome $username';
+          wellcomeText = 'Wellcome';
           break;
         case 'not-exists':
           isUserNotExists = true;
           wellcomeText = 'Please register';
-          break;
-        case 'ok':
-          Navigator.pop(context);
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => ProductsScreen(
-                  user: UserModel(
-                      userName: username, userEmail: usermailController.text),
-                ),
-              ),
-              (route) => false);
           break;
         case 'wrong-password':
           passwordHelper = 'Wrong password';
@@ -164,8 +145,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         .loginUser(usermailController.text,
                                             passwordController.text);
                                   } else if (isUserNotExists == true) {
-                                    ref.read(usernameProvider.notifier).update(
-                                        (state) => usernameController.text);
                                     ref
                                         .read(firebaseAuthProvider.notifier)
                                         .createUser(
@@ -173,11 +152,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                             passwordController.text,
                                             usernameController.text);
                                   }
-                                  ref
-                                      .read(usermailProvider.notifier)
-                                      .update((ref) => usermailController.text);
                                 }
-                              }, //tryAuth,
+                              },
                               child: Text(isUserNotExists == false
                                   ? 'Sign in'
                                   : 'Register'),
@@ -189,9 +165,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 passwordController.text = '';
                                 usernameController.text = '';
                                 passwordHelper = null;
-                                ref
-                                    .read(firebaseAuthProvider.notifier)
-                                    .switchUser();
                                 setState(() {});
                               },
                               child: const Text(
@@ -207,7 +180,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ],
                     ),
                   if (isUserNotExists == null)
-                    Column(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
                           onPressed: () {
@@ -225,6 +199,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             });
                           },
                           child: const Text('Next'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ref
+                                .read(firebaseAuthProvider.notifier)
+                                .signInWithGitHub(context, ref);
+                          },
+                          child: const Text(
+                            'GitHub',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
                         ),
                       ],
                     ),

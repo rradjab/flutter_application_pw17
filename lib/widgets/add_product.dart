@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_pw17/main.dart';
 import 'package:flutter_application_pw17/models/product_model.dart';
 import 'package:flutter_application_pw17/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProductAdd extends ConsumerWidget {
-  ProductAdd({super.key, required this.userEmail});
-  final String userEmail;
+  ProductAdd({super.key});
+
   final productNameController = TextEditingController()..text = 'product';
 
   final productPriceController = TextEditingController()
@@ -64,7 +65,7 @@ class ProductAdd extends ConsumerWidget {
                             price:
                                 num.tryParse(productPriceController.text) ?? 0,
                             purchased: false,
-                            userEmail: userEmail));
+                            userEmail: user.userEmail));
                     productNameController.text = '';
                     productPriceController.text =
                         (Random().nextDouble() * 256).toStringAsFixed(2);

@@ -1,43 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_pw17/consts/constants.dart';
 import 'package:flutter_application_pw17/providers/providers.dart';
 import 'package:flutter_application_pw17/models/product_model.dart';
+import 'package:flutter_application_pw17/services/products_notifier.dart';
 
 class ProductsView extends ConsumerWidget {
-  const ProductsView({required this.products, super.key});
-  final List<ProductModel> products;
+  const ProductsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sortItems = ref.watch(sortProvider);
-
-    switch (sortItems) {
-      case Sorting.nameA:
-        products.sort((a, b) => a.name!.compareTo(b.name!));
-        break;
-      case Sorting.nameD:
-        products.sort((b, a) => a.name!.compareTo(b.name!));
-        break;
-      case Sorting.priceA:
-        products.sort((a, b) => a.price!.compareTo(b.price!));
-        break;
-      case Sorting.priceD:
-        products.sort((b, a) => a.price!.compareTo(b.price!));
-        break;
-    }
-
-    return Column(
-      children: [
-        Expanded(
-            child: ListView.builder(
-          itemCount: products.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListItemWidget(product: products[index]);
-          },
-        ))
-      ],
-    );
+    final params = ref.watch(paramsProvider);
+    return ref.watch(firebaseProducts(params)).when(
+          data: ((data) => Column(
+                children: [
+                  Expanded(
+                      child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListItemWidget(product: data[index]);
+                    },
+                  ))
+                ],
+              )),
+          error: (Object error, StackTrace stackTrace) => Text(
+            error.toString(),
+            style: const TextStyle(color: Colors.amber, fontSize: 45),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+        );
   }
 }
 
